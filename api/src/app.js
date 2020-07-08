@@ -1,17 +1,15 @@
-/**
- * 
- */
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cors = require('cors');
 
-
 const app = express();
 
 //importar o database.js
 const localDatabase = require('./config/database');
+const databaseCosmosDb = require('./config/databaseCosmos');
+
 mongoose.Promise = global.Promise;
 
 //conexao com a base de dados local
@@ -26,7 +24,7 @@ mongoose.connect(localDatabase.local.localUrl, {
   })
 
 //rotas
-const index = require('./routes/index');
+
 const funcionarioRoute = require('./routes/funcionarioRoute');
 
 app.use(bodyParser.urlencoded({
@@ -39,7 +37,7 @@ app.use(bodyParser.json({
 app.use(morgan('dev'));
 app.use(cors());
 
-app.use('/api', index);
+
 app.use('/api/', funcionarioRoute);
 
 module.exports = app;

@@ -28,7 +28,7 @@ const funcionarioSchema = new Schema({
   },
 }, {
   timestamps: true,
-  collection: 'funcionario',
+  collection: 'funcionarios',
 })
 
 module.exports = mongoose.model('Funcionario', funcionarioSchema);
