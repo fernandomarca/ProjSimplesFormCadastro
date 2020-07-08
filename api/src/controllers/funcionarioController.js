@@ -1,134 +1,74 @@
-const Funcionario = require('../models/funcionario.Models');
+const Funcionario = require("../models/funcionario.Models");
+const {
+  Error
+} = require("mongoose");
 
 //metodo para criar um nova(o) 'funcionario'
 
-exports.create = (req, res) => {
-  //validar campos
-  if (!req.body.nomeFuncionario && !req.body.cargo && !req.body.numeroIdentificador) {
-    return res.status(400).send({
-      message: 'Os campos não podem estar vazios'
-    });
-  }
-
-  //criando um novo funcionario
-  const funcionario = new Funcionario({
-    nomeFuncionario: req.body.nomeFuncionario,
-    cargo: req.body.cargo,
-    numeroIdentificador: req.body.numeroIdentificador,
-  })
-  //salvando os dados do funcionario
-  funcionario.save()
-    .then((data) => {
-      res.status(200).send(data);
-    }).catch((err) => {
-      res.status(500).send({
-        message: 'Erro ao criar um novo(a) funcionário(a)' || err.message
-      })
-    })
-}
+exports.create = async (req, res) => {
+  const novoFuncionario = new Funcionario(req.body);
+  const funcionario = await novoFuncionario.save();
+  return res.status(201).send({
+    message: "funcionario criado com sucesso",
+    funcionario,
+  });
+};
 
 //metodo para selecionar todos os func.
-exports.findAll = (req, res) => {
-  Funcionario.find()
-    .then((funcionarios) => {
-      res.status(200).send(funcionarios);
-    }).catch((err) => {
-      res.status(500).send({
-        message: 'Erro ao selecionar todos os funcionarios(as)' || err.message
-      });
-    });
+exports.findAll = async (req, res) => {
+  const funcionarios = await Funcionario.find({});
+  return res.status(200).send(funcionarios);
 };
 
 //metodo resp. por selecionar funcionario pelo Id:
-exports.findById = (req, res) => {
-  Funcionario.findById(req.params.id)
-    .then((funcionario) => {
-
-      if (!funcionario) {
-        return res.status(404).send({
-          message: `Funcionario não encontrado ${req.params.id}`
-        });
-      }
-
-      res.status(200).send(funcionario);
-
-    }).catch((err) => {
-      if (err.kind == 'ObjectId') {
-        return res.status(400).send({
-          message: `Id do funcionario não encontrado ${req.params.id}`
-        })
-      }
-
-      res.status(500).send({
-        message: 'erro ao selecionar o funcionario' || err.message
-      })
-    })
-}
+exports.findById = async (req, res) => {
+  const funcionario = await Funcionario.findById(req.params.id);
+  if (!funcionario) {
+    return res.status(404).send({
+      message: `Funcionario não encontrado ${req.params.id}`,
+    });
+  }
+  return res.status(200).send(funcionario);
+};
 
 //metodo resp. por atualizar um funcionario
-exports.update = (req, res) => {
-  //validar campos
-  if (!req.body.nomeFuncionario) {
+exports.update = async (req, res) => {
+  //validar campos vazios:
+  if (!req.body.nomeFuncionario || !req.body.cargo || !req.body.numeroIdentificador) {
     return res.status(400).send({
-      message: 'Os campos nao podem ser vazios'
+      message: 'Os campos não podem ser vazios'
     })
   }
 
-  //encontrar o Id funcionario e depois atualizar os dados via request
-  Funcionario.findByIdAndUpdate(req.params.id, {
-      nomeFuncionario: req.body.nomeFuncionario,
-      cargo: req.body.cargo,
-      numeroIdentificador: req.body.numeroIdentificador,
-    }, {
-      new: true
-    })
-    .then((funcionario) => {
-      if (!funcionario) {
-        res.status(404).send({
-          message: `Funcionario não encontrado ${req.params.id}`
-        })
-      }
+  const funcionario = await Funcionario.findByIdAndUpdate(req.params.id, req.body);
 
-      res.status(200).send({
-        message: 'funcionario atualizado com sucesso!',
-        funcionario
-      })
+  if (!funcionario) {
+    return res.status(401).send({
+      message: 'Funcionario nao encontrado',
+      funcionario
+    });
+  }
+  //console.log(funcionario) tratar CastError
 
-    }).catch((err) => {
-      if (err.kind == 'ObjectId') {
-        return res.status(404).send({
-          message: `erro ao encontrar o Ido do funcionario ${res.params.id}`
-        })
-      }
-
-      res.status(500).send({
-        message: `erro ao atualizar os dados do funcionario ${req.params.id}`
-      })
-    })
+  return res.status(200).send({
+    message: 'funcionario atualizado com sucesso',
+    funcionario
+  })
 }
 
 //metodo resp. por excluir funcionario por id
-exports.delete = (req, res) => {
-  Funcionario.findByIdAndDelete(req.params.id)
-    .then((funcionario) => {
-      if (!funcionario) {
-        return res.status(404).send({
-          message: `id do funcionario não encontrado ${req.params.id}`
-        });
-      }
+exports.delete = async (req, res) => {
+  const funcionario = await Funcionario.findByIdAndDelete(req.params.id)
 
-      res.status(200).send({
-        message: 'funcionario excluido com sucesso!',
-        funcionario
-      })
-    }).catch((err) => {
-      if (err.kind == 'ObjectId') {
-        return res.status(404).send({
-          message: `O funcionario com Id ${req.params.id} não foi encontrado`
-        })
-      }
-      return res.status(500).send({
-        message: `erro ao excluir o funcionario ${req.params.id}`
-      })
-    })
-}
+  if (!funcionario) {
+    return res.status(404).send({
+      message: `id do funcionario não encontrado ${req.params.id}`,
+    });
+  }
+
+  return res.status(200).send({
+    message: "funcionario excluido com sucesso!",
+    funcionario,
+  });
+
+};
