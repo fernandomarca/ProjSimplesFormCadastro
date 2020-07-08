@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { SlimLoadingBarModule } from 'ng2-slim-loading-bar';
 //import { AngularFontAwesomeModule } from 'angular-font-awesome';
@@ -21,6 +22,7 @@ import { FuncionarioService } from './funcionario.service';
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     SlimLoadingBarModule,
     ReactiveFormsModule,

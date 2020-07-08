@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class FuncionarioService {
-  uri = '/funcionario';
+  uri = 'http://localhost:8000/api';
 
   constructor(private http: HttpClient) {}
 
@@ -16,14 +16,23 @@ export class FuncionarioService {
     numeroIdentificador: Number
   ) {
     const objFuncionario = {
-      nomeFuncionario: nomeFuncionario,
-      cargo: cargo,
-      numeroIdentificador: numeroIdentificador,
+      nomeFuncionario,
+      cargo,
+      numeroIdentificador,
     };
 
     console.log(objFuncionario);
-    this.http
-      .post(`${this.uri}/add`, objFuncionario)
-      .subscribe((res) => console.log('ok'));
+
+    //post url back-end http://localhost:8000/api/funcionarios
+    return this.http
+      .post(`${this.uri}/funcionarios`, objFuncionario)
+      .subscribe((res) => console.log('feito'));
+  }
+
+  /**
+   * metodo para selecionar os func.
+   */
+  getFuncionarios() {
+    return this.http.get(`${this.uri}/funcionarios`);
   }
 }

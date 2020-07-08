@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FuncionarioService } from '../funcionario.service';
+import Funcionario from '../Funcionario';
 
 @Component({
   selector: 'app-func-add',
@@ -39,5 +40,12 @@ export class FuncAddComponent implements OnInit {
       numeroIdentificador
     );
   }
-  ngOnInit(): void {}
+  funcionarios: Funcionario[];
+  ngOnInit(): void {
+    this.funcionarioService
+      .getFuncionarios()
+      .subscribe((data: Funcionario[]) => {
+        this.funcionarios = data;
+      });
+  }
 }
